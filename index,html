@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contrato Interativo – Studio D & Matheus Laurindo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Chosen Palette: Warm Neutral & Soft Teal -->
+    <!-- Application Structure Plan: A tabbed-dashboard interface was chosen to deconstruct the dense legal contract into logical, user-friendly sections. This structure abandons the linear format of the original document in favor of a task-oriented approach. Users can immediately access key sections like "Financeiro" or "Obrigações" without scrolling. This improves usability by allowing parties to quickly find specific information and understand the core components of the agreement at a glance. An interactive "Visão Geral" serves as a summary dashboard for the most critical terms. -->
+    <!-- Visualization & Content Choices: 
+        - Report Info: Parties' details -> Goal: Inform -> Viz/Presentation: Styled cards with icons -> Interaction: Static display -> Justification: Clear, immediate identification of parties. -> Library/Method: HTML/Tailwind.
+        - Report Info: Contract clauses -> Goal: Organize -> Viz/Presentation: Tabbed interface -> Interaction: Click to switch views -> Justification: Breaks down complex information into manageable chunks, improving navigation and comprehension. -> Library/Method: Vanilla JS.
+        - Report Info: Pricing tiers -> Goal: Compare/Inform -> Viz/Presentation: Dynamically highlighted price boxes -> Interaction: Automatic highlighting based on current date -> Justification: Provides instant clarity on the applicable fee, making the document feel "live" and context-aware. -> Library/Method: Vanilla JS.
+        - Report Info: Contract term (6 months) -> Goal: Inform/Change -> Viz/Presentation: Horizontal Bar Chart -> Interaction: Static visualization -> Justification: Offers a simple, intuitive visual representation of the contract's duration. -> Library/Method: Chart.js/Canvas.
+        - Report Info: Obligations -> Goal: Compare -> Viz/Presentation: Two-column layout -> Interaction: Static display -> Justification: Simplifies comparison of responsibilities between parties. -> Library/Method: HTML/Tailwind.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .tab-button.active {
+            border-color: #14b8a6;
+            color: #14b8a6;
+            background-color: #f0fdfa;
+        }
+        .tab-button {
+            transition: all 0.2s ease-in-out;
+        }
+        .price-box.active {
+            border-color: #14b8a6;
+            background-color: #f0fdfa;
+            transform: scale(1.02);
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+        .price-box {
+            transition: all 0.3s ease-in-out;
+        }
+        .price-box.inactive {
+            filter: grayscale(80%);
+            opacity: 0.7;
+        }
+        .chart-container {
+            position: relative;
+            height: 120px;
+            max-height: 120px;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    </style>
+    <link rel="preconnect" href="https://rsms.me/">
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+    <div class="max-w-6xl mx-auto p-4 sm:p-6 lg:p-8">
+        
+        <header class="text-center mb-8">
+            <h1 class="text-3xl md:text-4xl font-bold text-teal-600">Contrato de Gestão de Tráfego Pago</h1>
+            <p class="text-slate-500 mt-2">Studio D & Matheus Henrique Laurindo</p>
+        </header>
+
+        <div class="bg-white rounded-lg shadow-lg p-4 sm:p-6">
+            <nav class="flex flex-wrap border-b border-slate-200 mb-6">
+                <button data-tab="overview" class="tab-button active text-sm sm:text-base font-medium py-3 px-3 sm:px-5 border-b-2 border-transparent hover:border-teal-500 hover:text-teal-500">Visão Geral</button>
+                <button data-tab="parties" class="tab-button text-sm sm:text-base font-medium py-3 px-3 sm:px-5 border-b-2 border-transparent hover:border-teal-500 hover:text-teal-500">Partes</button>
+                <button data-tab="services" class="tab-button text-sm sm:text-base font-medium py-3 px-3 sm:px-5 border-b-2 border-transparent hover:border-teal-500 hover:text-teal-500">Serviços</button>
+                <button data-tab="financial" class="tab-button text-sm sm:text-base font-medium py-3 px-3 sm:px-5 border-b-2 border-transparent hover:border-teal-500 hover:text-teal-500">Financeiro</button>
+                <button data-tab="term" class="tab-button text-sm sm:text-base font-medium py-3 px-3 sm:px-5 border-b-2 border-transparent hover:border-teal-500 hover:text-teal-500">Prazo e Rescisão</button>
+                <button data-tab="obligations" class="tab-button text-sm sm:text-base font-medium py-3 px-3 sm:px-5 border-b-2 border-transparent hover:border-teal-500 hover:text-teal-500">Obrigações</button>
+                <button data-tab="confidentiality" class="tab-button text-sm sm:text-base font-medium py-3 px-3 sm:px-5 border-b-2 border-transparent hover:border-teal-500 hover:text-teal-500">Confidencialidade</button>
+                <button data-tab="signatures" class="tab-button text-sm sm:text-base font-medium py-3 px-3 sm:px-5 border-b-2 border-transparent hover:border-teal-500 hover:text-teal-500">Assinaturas</button>
+            </nav>
+
+            <main>
+                <!-- Visão Geral -->
+                <section id="overview" class="tab-content">
+                    <div class="prose max-w-none">
+                        <p class="text-slate-600 mb-6">Esta é uma visão geral dos termos mais importantes do contrato. Para detalhes completos, navegue pelas abas acima. Este painel interativo resume o acordo legal para facilitar a consulta e o entendimento mútuo.</p>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div class="bg-slate-100 p-6 rounded-lg">
+                            <h3 class="font-bold text-lg mb-2 text-teal-700">Objeto Principal</h3>
+                            <p class="text-slate-600">Gestão de Tráfego Pago (Facebook/Instagram Ads) para aumentar a visibilidade do perfil e gerar leads via WhatsApp.</p>
+                        </div>
+                        <div class="bg-slate-100 p-6 rounded-lg">
+                            <h3 class="font-bold text-lg mb-2 text-teal-700">Valor Mensal (Atual)</h3>
+                            <p id="overview-price" class="text-slate-600 text-2xl font-bold">--</p>
+                            <p class="text-sm text-slate-500">Valor atual baseado na data de assinatura.</p>
+                        </div>
+                        <div class="bg-slate-100 p-6 rounded-lg">
+                            <h3 class="font-bold text-lg mb-2 text-teal-700">Prazo do Contrato</h3>
+                            <p class="text-slate-600 text-2xl font-bold">6 meses</p>
+                            <p class="text-sm text-slate-500">Com renovação automática via Cartão de Crédito.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Partes -->
+                <section id="parties" class="tab-content hidden">
+                    <div class="prose max-w-none">
+                        <p class="text-slate-600 mb-6">As partes envolvidas neste contrato são o CONTRATANTE, o cliente que recebe os serviços, e o CONTRATADO, o profissional responsável pela execução. As informações de contato e identificação são fundamentais para a comunicação oficial entre ambos.</p>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="border border-slate-200 rounded-lg p-6">
+                            <h3 class="font-bold text-xl mb-4 text-teal-700">CONTRATANTE</h3>
+                            <p><strong>Razão Social:</strong> Deybson Robson Ortelhado</p>
+                            <p><strong>Nome Fantasia:</strong> Studio D</p>
+                            <p><strong>CNPJ:</strong> 33.998.489/0001-91</p>
+                            <p><strong>Endereço:</strong> [Endereço Completo], Várzea Grande, MT, 78110-000</p>
+                            <p><strong>Telefone:</strong> (65) 99277-2500</p>
+                            <p><strong>E-mail:</strong> pilltwiggue@gmail.com</p>
+                        </div>
+                        <div class="border border-slate-200 rounded-lg p-6">
+                            <h3 class="font-bold text-xl mb-4 text-teal-700">CONTRATADO</h3>
+                            <p><strong>Nome Completo:</strong> Matheus Henrique Laurindo</p>
+                            <p><strong>CPF:</strong> 100.936.909-16</p>
+                            <p><strong>Endereço:</strong> Rua Aquidabã, 199, Escola Agrícola, Blumenau, SC, 89037-740</p>
+                            <p><strong>Telefone:</strong> (47) 99217-6490</p>
+                            <p><strong>E-mail:</strong> laurindomatheus40@gmail.com</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Serviços -->
+                <section id="services" class="tab-content hidden prose max-w-none">
+                     <p class="text-slate-600 mb-6">Esta seção detalha o escopo dos serviços a serem prestados. Define claramente o que está incluído no objeto do contrato, como a gestão das campanhas, e o que não está, como a otimização de landing pages, que pode ser contratada separadamente.</p>
+                    <h2 class="text-teal-700">CLÁUSULA PRIMEIRA – DO OBJETO DO CONTRATO</h2>
+                    <p>1.1. O presente Contrato tem como objeto a prestação de serviços de Gestão de Tráfego Pago pelo CONTRATADO para o CONTRATANTE, visando a otimização de campanhas publicitárias online nas plataformas Facebook/Instagram Ads, com os seguintes objetivos principais:</p>
+                    <ul>
+                        <li>a) Aumento da visualização do perfil do Studio D no Instagram;</li>
+                        <li>b) Geração de Leads via WhatsApp para agendamento de serviços de salão de beleza e harmonização facial.</li>
+                    </ul>
+                    <p>1.2. A gestão do tráfego pago incluirá a criação, configuração, monitoramento e otimização das campanhas nas plataformas mencionadas.</p>
+                    <p>1.3. A criação de criativos (vídeos e outras peças) será realizada com colaboração mútua. A criação exclusiva de vídeos pelo CONTRATADO será mediante acordo prévio.</p>
+                    <p>1.4. A otimização de páginas de destino (landing pages) <strong>NÃO está inclusa</strong> e será cobrada à parte, caso solicitada.</p>
+                </section>
+
+                <!-- Financeiro -->
+                <section id="financial" class="tab-content hidden">
+                    <div class="prose max-w-none">
+                        <p class="text-slate-600 mb-6">Aqui estão definidos todos os aspectos financeiros do acordo. O sistema abaixo destaca dinamicamente o valor mensal aplicável com base na data atual, de acordo com os termos do contrato. Também esclarece a responsabilidade sobre o investimento em anúncios.</p>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div id="price-1500" class="price-box border-2 border-slate-200 rounded-lg p-6 text-center">
+                            <p class="text-sm text-slate-500">Se assinado até 30/06/2025</p>
+                            <p class="text-4xl font-bold my-2">R$ 1.500,00</p>
+                            <p class="text-slate-600">por mês</p>
+                        </div>
+                        <div id="price-1900" class="price-box border-2 border-slate-200 rounded-lg p-6 text-center">
+                            <p class="text-sm text-slate-500">Se assinado após 30/06/2025</p>
+                            <p class="text-4xl font-bold my-2">R$ 1.900,00</p>
+                            <p class="text-slate-600">por mês</p>
+                        </div>
+                    </div>
+                    <div class="prose max-w-none">
+                      <p>2.2. Os pagamentos serão realizados mensalmente, com vencimento no mesmo dia de cada mês correspondente à data de assinatura.</p>
+                      <p>2.3. Pagamentos via cartão de crédito podem ser feitos pelo link: <a href="https://www.asaas.com/c/922ne9tix6v8zm6c" target="_blank" class="text-teal-600 hover:underline">Link de Pagamento Asaas</a>.</p>
+                      <p>2.4. Não haverá cobrança de taxa de setup ou ativação.</p>
+                      <p>2.5. O <strong>CONTRATANTE é o único responsável pelo investimento em mídia paga</strong> (verba de anúncios), definindo o valor a ser investido.</p>
+                    </div>
+                </section>
+
+                <!-- Prazo e Rescisão -->
+                <section id="term" class="tab-content hidden">
+                    <div class="prose max-w-none">
+                        <p class="text-slate-600 mb-6">Esta seção governa a duração do contrato, as regras para sua renovação e as condições para rescisão. O gráfico abaixo ilustra a duração inicial do contrato, enquanto as cláusulas detalham as multas e procedimentos em caso de término antecipado.</p>
+                    </div>
+                    <div class="my-6">
+                         <h3 class="font-bold text-lg mb-2 text-center text-teal-700">Duração Inicial do Contrato</h3>
+                         <div class="chart-container">
+                             <canvas id="termChart"></canvas>
+                         </div>
+                    </div>
+                    <div class="prose max-w-none">
+                        <h3 class="text-teal-700">Prazo e Renovação</h3>
+                        <p>3.1. O Contrato tem prazo determinado de 6 (seis) meses.</p>
+                        <p>3.2. A renovação é automática por iguais períodos se o pagamento for via Cartão de Crédito.</p>
+                        <p>3.3. Pagamentos via PIX não geram renovação automática.</p>
+                        <h3 class="text-teal-700 mt-4">Rescisão e Multas</h3>
+                        <p>4.1. Rescisão imotivada pode ocorrer por qualquer parte com aviso prévio de 7 dias.</p>
+                        <p>4.2. Em caso de rescisão antecipada pelo CONTRATANTE (antes dos 6 meses), haverá multa de <strong>2% do valor total restante</strong> do contrato.</p>
+                        <p>4.3. Rescisão por justa causa (descumprimento grave) é imediata.</p>
+                    </div>
+                </section>
+
+                <!-- Obrigações -->
+                <section id="obligations" class="tab-content hidden">
+                     <div class="prose max-w-none">
+                        <p class="text-slate-600 mb-6">O sucesso da parceria depende do cumprimento das responsabilidades de cada parte. A seguir, as obrigações do CONTRATADO e do CONTRATANTE são apresentadas lado a lado para maior clareza e fácil consulta.</p>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="border border-slate-200 rounded-lg p-6">
+                            <h3 class="font-bold text-xl mb-4 text-teal-700">Obrigações do CONTRATADO</h3>
+                            <ul class="list-disc list-inside space-y-2">
+                                <li>Criar, configurar e gerenciar as campanhas.</li>
+                                <li>Realizar acompanhamento diário e otimização.</li>
+                                <li>Apresentar relatórios de desempenho.</li>
+                                <li>Manter sigilo sobre informações confidenciais.</li>
+                            </ul>
+                        </div>
+                        <div class="border border-slate-200 rounded-lg p-6">
+                            <h3 class="font-bold text-xl mb-4 text-teal-700">Obrigações do CONTRATANTE</h3>
+                            <ul class="list-disc list-inside space-y-2">
+                                <li>Efetuar os pagamentos em dia.</li>
+                                <li>Aprovar as verbas de investimento em mídia.</li>
+                                <li>Fornecer informações, acessos e materiais necessários.</li>
+                                <li>Não interferir nas campanhas sem alinhamento prévio.</li>
+                            </ul>
+                        </div>
+                    </div>
+                     <div class="prose max-w-none mt-6">
+                        <p>8.3. As metas mensais (KPIs) serão estabelecidas em reunião de planejamento estratégico.</p>
+                        <h3 class="text-teal-700 mt-4">Acessos e Propriedade Intelectual</h3>
+                        <p>5.2. O acesso às contas será via agência ROI-360, exigindo login do Instagram e cartões virtuais.</p>
+                        <p>7.1. Criativos fornecidos pela agência ROI-360 são de propriedade da agência.</p>
+                        <p>7.2. Criativos fornecidos pelo CONTRATANTE são de sua propriedade.</p>
+                        <p>7.3. Estratégias desenvolvidas pelo CONTRATADO são de sua propriedade intelectual.</p>
+                    </div>
+                </section>
+                
+                <!-- Confidencialidade -->
+                <section id="confidentiality" class="tab-content hidden prose max-w-none">
+                    <p class="text-slate-600 mb-6">A proteção de informações sensíveis e o cumprimento da legislação de proteção de dados são cruciais. Esta seção estabelece os deveres de confidencialidade mútua e a conformidade com a Lei Geral de Proteção de Dados (LGPD).</p>
+                    <h2 class="text-teal-700">CLÁUSULA SEXTA – DA CONFIDENCIALIDADE E PROTEÇÃO DE DADOS</h2>
+                    <p>6.1. As partes concordam em manter total confidencialidade sobre todas as informações estratégicas, comerciais, financeiras e de clientes da outra parte.</p>
+                    <p>6.2. A confidencialidade é mútua, cobrindo informações estratégicas da agência e dados financeiros/de clientes do CONTRATANTE.</p>
+                    <p>6.3. O CONTRATADO só poderá usar resultados do Studio D em seu portfólio com autorização prévia e expressa do CONTRATANTE.</p>
+                    <p>6.4. As partes se comprometem a cumprir a LGPD (Lei nº 13.709/2018). O CONTRATANTE é o Controlador dos Dados e o CONTRATADO é o Operador dos Dados.</p>
+                </section>
+
+                <!-- Assinaturas -->
+                <section id="signatures" class="tab-content hidden prose max-w-none">
+                    <p class="text-slate-600 mb-6">Para formalizar o acordo, as partes e duas testemunhas devem assinar o instrumento. Este espaço digital representa a seção de assinaturas do documento físico, que deve ser preenchido e assinado para que o contrato tenha validade legal.</p>
+                    <p>E, por estarem assim justas e contratadas, as partes assinam o presente Contrato em 2 (duas) vias de igual teor e forma, na presença das duas testemunhas abaixo.</p>
+                    <p>Blumenau, Santa Catarina, 27 de junho de 2025.</p>
+                    
+                    <div class="mt-12 grid grid-cols-1 md:grid-cols-2 gap-12 text-center">
+                        <div>
+                            <p class="border-t border-slate-400 pt-2">Deybson Robson Ortelhado</p>
+                            <p class="text-sm text-slate-500">CONTRATANTE (CNPJ: 33.998.489/0001-91)</p>
+                        </div>
+                        <div>
+                            <p class="border-t border-slate-400 pt-2">Matheus Henrique Laurindo</p>
+                            <p class="text-sm text-slate-500">CONTRATADO (CPF: 100.936.909-16)</p>
+                        </div>
+                    </div>
+
+                    <h3 class="text-center mt-16 font-bold text-teal-700">TESTEMUNHAS</h3>
+                     <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-12 text-center">
+                        <div>
+                            <p class="border-t border-slate-400 pt-2">Nome Completo</p>
+                            <p class="text-sm text-slate-500">CPF:</p>
+                        </div>
+                        <div>
+                            <p class="border-t border-slate-400 pt-2">Nome Completo</p>
+                            <p class="text-sm text-slate-500">CPF:</p>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const tabs = document.querySelectorAll('.tab-button');
+            const tabContents = document.querySelectorAll('.tab-content');
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const target = tab.getAttribute('data-tab');
+
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+
+                    tabContents.forEach(content => {
+                        if (content.id === target) {
+                            content.classList.remove('hidden');
+                        } else {
+                            content.classList.add('hidden');
+                        }
+                    });
+                });
+            });
+
+            const deadline = new Date('2025-06-30T23:59:59-03:00');
+            const now = new Date();
+            const price1500 = document.getElementById('price-1500');
+            const price1900 = document.getElementById('price-1900');
+            const overviewPrice = document.getElementById('overview-price');
+            let currentPrice = 'R$ 1.900,00';
+
+            if (now <= deadline) {
+                price1500.classList.add('active');
+                price1900.classList.add('inactive');
+                currentPrice = 'R$ 1.500,00';
+            } else {
+                price1900.classList.add('active');
+                price1500.classList.add('inactive');
+                currentPrice = 'R$ 1.900,00';
+            }
+            overviewPrice.textContent = currentPrice;
+            
+            const termCtx = document.getElementById('termChart').getContext('2d');
+            new Chart(termCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Prazo Inicial (Meses)'],
+                    datasets: [{
+                        label: 'Duração',
+                        data: [6],
+                        backgroundColor: ['rgba(20, 184, 166, 0.6)'],
+                        borderColor: ['rgba(13, 148, 136, 1)'],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            max: 7,
+                            ticks: {
+                                stepSize: 1
+                            }
+                        },
+                         y: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
